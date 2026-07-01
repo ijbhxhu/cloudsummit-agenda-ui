@@ -284,6 +284,69 @@
       return haystack.includes(query);
     }
 
+    function parseTimeToMinutes(time) {
+      const [start] = time.split(' - ');
+      const [hour, minute] = start.split(':').map(Number);
+      return hour * 60 + minute;
+    }
+
+    function getTaipeiClock() {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Taipei',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).formatToParts(new Date());
+      const map = Object.fromEntries(parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]));
+      return {
+        date: `${map.year}-${map.month}-${map.day}`,
+        minutes: Number(map.hour) * 60 + Number(map.minute),
+      };
+    }
+
+    function getVisibleBlocks(query) {
+      return agenda
+        .map((block) => ({
+          ...block,
+          items: block.items.filter((item) => matches(item, query)),
+        }))
+        .filter((block) => block.items.length > 0);
+    }
+
+    function pickNowAndNext(blocks) {
+      if (!blocks.length) return { current: null, next: null };
+      const clock = getTaipeiClock();
+      const eventDate = '2026-07-01';
+      const blocksWithMinutes = blocks.map((block) => ({ ...block, startMinutes: parseTimeToMinutes(block.time) }));
+      if (clock.date < eventDate) {
+        return { current: blocksWithMinutes[0], next: blocksWithMinutes[1] || blocksWithMinutes[0] };
+      }
+      if (clock.date > eventDate) {
+        return { current: blocksWithMinutes[blocksWithMinutes.length - 1], next: blocksWithMinutes[blocksWithMinutes.length - 1] };
+      }
+      const currentIndex = blocksWithMinutes.findIndex((block, index) => {
+        const currentStart = block.startMinutes;
+        const nextStart = blocksWithMinutes[index + 1]?.startMinutes ?? 24 * 60;
+        return clock.minutes >= currentStart && clock.minutes < nextStart;
+      });
+      if (currentIndex >= 0) {
+        return {
+          current: blocksWithMinutes[currentIndex],
+          next: blocksWithMinutes[currentIndex + 1] || blocksWithMinutes[currentIndex],
+        };
+      }
+      if (clock.minutes < blocksWithMinutes[0].startMinutes) {
+        return { current: blocksWithMinutes[0], next: blocksWithMinutes[1] || blocksWithMinutes[0] };
+      }
+      return {
+        current: blocksWithMinutes[blocksWithMinutes.length - 1],
+        next: blocksWithMinutes[blocksWithMinutes.length - 1],
+      };
+    }
+
     function updateBackTop() {
       if (window.scrollY > 420) {
         backTop.classList.add('visible');
@@ -295,11 +358,10 @@
     function renderAgenda() {
       const query = search.value.trim().toLowerCase();
       agendaRoot.innerHTML = '';
-      let firstVisible = null;
+      const visibleBlocks = getVisibleBlocks(query);
 
-      for (const block of agenda) {
-        const items = block.items.filter((item) => matches(item, query));
-        if (items.length === 0) continue;
+      for (const block of visibleBlocks) {
+        const items = block.items;
         const section = document.createElement('section');
         section.className = 'section';
         section.id = slugify(block.time);
@@ -337,20 +399,23 @@
         return;
       }
 
-      const visibleAgenda = agenda.flatMap((block) => block.items.filter((item) => matches(item, query)).map((item) => ({ block, item })));
-      const spotlight = visibleAgenda[0];
-      const later = visibleAgenda[1] || visibleAgenda[0];
+      const spotlightSet = visibleBlocks.flatMap((block) => block.items.map((item) => ({ block, item })));
+      const { current, next } = pickNowAndNext(visibleBlocks);
+      const currentItem = current?.items[0] || spotlightSet[0]?.item;
+      const nextItem = next?.items[0] || spotlightSet[1]?.item || spotlightSet[0]?.item;
+      const currentLabel = current && current.time === next?.time ? '目前這場' : '目前這段';
+      const nextLabel = next && next.time === current?.time ? '下一場' : '下一場';
       nextUp.innerHTML = `
         <div class="callout">
-          <div class="eyebrow">下一場</div>
-          <p class="big">${spotlight.block.time}</p>
-          <p style="margin:10px 0 6px;font-weight:700;">${spotlight.item.title}</p>
-          <p style="margin:0;color:#4e426d;">${spotlight.item.room} · ${spotlight.block.level}</p>
+          <div class="eyebrow">${currentLabel}</div>
+          <p class="big">${current ? current.time : spotlightSet[0].block.time}</p>
+          <p style="margin:10px 0 6px;font-weight:700;">${currentItem.title}</p>
+          <p style="margin:0;color:#4e426d;">${currentItem.room} · ${current ? current.level : visibleBlocks[0].level}</p>
         </div>
         <div class="callout" style="background:rgba(36,120,143,0.08);border-color:rgba(36,120,143,0.14);color:#174e5e;">
-          <div class="eyebrow">備選焦點</div>
-          <p style="margin:10px 0 6px;font-weight:700;">${later.item.title}</p>
-          <p style="margin:0;opacity:.86;">${later.block.time} · ${later.item.room}</p>
+          <div class="eyebrow">${nextLabel}</div>
+          <p style="margin:10px 0 6px;font-weight:700;">${nextItem.title}</p>
+          <p style="margin:0;opacity:.86;">${next ? next.time : current.time} · ${nextItem.room}</p>
         </div>
       `;
     }
@@ -362,6 +427,7 @@
     renderTimeNav();
     renderAgenda();
     updateBackTop();
+    setInterval(renderAgenda, 60 * 1000);
   </script>
 </body>
 </html>
