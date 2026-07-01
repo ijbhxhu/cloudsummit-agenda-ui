@@ -327,23 +327,18 @@
       if (clock.date > eventDate) {
         return { current: blocksWithMinutes[blocksWithMinutes.length - 1], next: blocksWithMinutes[blocksWithMinutes.length - 1] };
       }
-      const currentIndex = blocksWithMinutes.findIndex((block, index) => {
-        const currentStart = block.startMinutes;
-        const nextStart = blocksWithMinutes[index + 1]?.startMinutes ?? 24 * 60;
-        return clock.minutes >= currentStart && clock.minutes < nextStart;
-      });
-      if (currentIndex >= 0) {
-        return {
-          current: blocksWithMinutes[currentIndex],
-          next: blocksWithMinutes[currentIndex + 1] || blocksWithMinutes[currentIndex],
-        };
-      }
-      if (clock.minutes < blocksWithMinutes[0].startMinutes) {
-        return { current: blocksWithMinutes[0], next: blocksWithMinutes[1] || blocksWithMinutes[0] };
+      const now = Number.isFinite(clock.minutes) ? clock.minutes : blocksWithMinutes[0].startMinutes;
+      let currentIndex = 0;
+      for (let index = 0; index < blocksWithMinutes.length; index += 1) {
+        if (now >= blocksWithMinutes[index].startMinutes) {
+          currentIndex = index;
+        } else {
+          break;
+        }
       }
       return {
-        current: blocksWithMinutes[blocksWithMinutes.length - 1],
-        next: blocksWithMinutes[blocksWithMinutes.length - 1],
+        current: blocksWithMinutes[currentIndex],
+        next: blocksWithMinutes[currentIndex + 1] || blocksWithMinutes[currentIndex],
       };
     }
 
