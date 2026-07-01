@@ -147,17 +147,63 @@
       pointer-events: auto;
     }
     .backtop:hover { background: rgba(50, 35, 23, 0.96); }
+    .mobile-dock {
+      display: none;
+    }
+    .dock-btn {
+      appearance: none;
+      border: 1px solid rgba(68, 51, 37, 0.12);
+      background: rgba(250, 245, 236, 0.94);
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 10px 8px;
+      text-align: center;
+      box-shadow: 0 12px 28px rgba(36, 25, 16, 0.12);
+      display: grid;
+      gap: 2px;
+      justify-items: center;
+      font: inherit;
+      cursor: pointer;
+      min-height: 58px;
+    }
+    .dock-btn strong {
+      font-size: 0.88rem;
+      line-height: 1.1;
+    }
+    .dock-btn small {
+      font-size: 0.7rem;
+      line-height: 1.1;
+      color: var(--muted);
+    }
+    .dock-btn:hover { border-color: rgba(95,76,156,0.28); }
     .hidden { display: none !important; }
     @media (max-width: 1200px) {
       .hero { grid-template-columns: 1fr; }
       .hero-copy, .sidebar { position: static; }
     }
     @media (max-width: 720px) {
-      .wrap { padding: 16px; }
+      .wrap { padding: 16px; padding-bottom: 104px; }
       .topbar { border-radius: 22px; padding: 14px; }
       .topbar nav { display: none; }
+      .mobile-dock {
+        position: fixed;
+        left: 14px;
+        right: 14px;
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        z-index: 35;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        padding: 10px;
+        border-radius: 22px;
+        background: rgba(251, 247, 240, 0.92);
+        border: 1px solid rgba(68, 51, 37, 0.12);
+        box-shadow: 0 18px 40px rgba(36, 25, 16, 0.16);
+        backdrop-filter: blur(16px);
+      }
       .hero-stats { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
+      .dock-btn { min-height: 56px; padding: 9px 6px; }
     }
   </style>
 </head>
@@ -219,12 +265,30 @@
     </main>
 
     <section class="content" id="timeline"></section>
+    <div class="mobile-dock" aria-label="快速導覽">
+      <button class="dock-btn" type="button" data-scroll="#highlight">
+        <strong>焦點</strong>
+        <small>今日 / 下一場</small>
+      </button>
+      <button class="dock-btn" type="button" data-scroll="#timeline">
+        <strong>議程</strong>
+        <small>全部時段</small>
+      </button>
+      <button class="dock-btn" type="button" data-focus-search>
+        <strong>搜尋</strong>
+        <small>講題關鍵字</small>
+      </button>
+      <a class="dock-btn" href="#top">
+        <strong>回頂</strong>
+        <small>頁面開頭</small>
+      </a>
+    </div>
     <a class="backtop" id="backTop" href="#top" aria-label="回到上方">↑ 回到上方</a>
     <div class="footer">來源：Cloud Summit 2026 臺灣雲端大會議程頁（7/1）。</div>
   </div>
 
   <script>
-    const BUILD_VERSION = '2026-07-01-04-08';
+    const BUILD_VERSION = '2026-07-01-04-10';
     const agenda = [
   {
     "time": "09:15 - 09:30",
@@ -503,6 +567,7 @@
     const nextUp = document.getElementById('nextUp');
     const search = document.getElementById('search');
     const backTop = document.getElementById('backTop');
+    const mobileDock = document.querySelector('.mobile-dock');
 
     const colorPalette = ['#24788f', '#c06b4f', '#5f4c9c', '#3b8f5d', '#b77d27', '#7b5a43'];
     let pinnedTime = null;
@@ -669,6 +734,12 @@
       history.replaceState({}, '', `#${sectionId}`);
     }
 
+    function focusSearch() {
+      search.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      search.focus({ preventScroll: true });
+      if (typeof search.select === 'function') search.select();
+    }
+
     function focusTime(time) {
       pinnedTime = time;
       renderTimeNav();
@@ -788,6 +859,16 @@
         if (!link) return;
         event.preventDefault();
         focusTime(link.dataset.target);
+      });
+      mobileDock.addEventListener('click', (event) => {
+        const target = event.target.closest('[data-scroll], [data-focus-search]');
+        if (!target) return;
+        event.preventDefault?.();
+        if (target.dataset.scroll) {
+          scrollToSection(target.dataset.scroll.replace(/^#/, ''));
+        } else if (target.hasAttribute('data-focus-search')) {
+          focusSearch();
+        }
       });
       window.addEventListener('hashchange', syncFromHash);
       search.addEventListener('input', renderAgenda);
