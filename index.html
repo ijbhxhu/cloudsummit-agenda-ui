@@ -88,14 +88,18 @@
     .search:focus { border-color: rgba(95,76,156,0.4); box-shadow: 0 0 0 4px rgba(95,76,156,0.08); }
     .side-title { font-weight: 700; margin-bottom: 10px; font-size: 0.95rem; }
     .sidebar .list { display: grid; gap: 10px; }
-    .time-chip { justify-content: space-between; width: 100%; cursor: pointer; transition: transform .15s ease, border-color .15s ease; font: inherit; text-align: left; }
+    .time-chip { justify-content: space-between; width: 100%; cursor: pointer; transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease; font: inherit; text-align: left; }
     .time-chip:hover { transform: translateY(-1px); border-color: rgba(95,76,156,0.4); }
+    .time-chip.is-active, .time-chip[aria-current="true"] { border-color: rgba(95,76,156,0.42); background: rgba(95,76,156,0.12); color: #362d63; box-shadow: 0 10px 22px rgba(95,76,156,0.10); }
     .time-chip:focus-visible, .btn:focus-visible, .backtop:focus-visible { outline: 3px solid rgba(95,76,156,0.28); outline-offset: 3px; }
     .theme-pills { display: flex; flex-wrap: wrap; gap: 8px; }
     .theme { padding: 7px 10px; border-radius: 999px; background: rgba(95,76,156,0.08); color: #4a3f7b; border: 1px solid rgba(95,76,156,0.12); font-size: 0.82rem; }
     .content { display: grid; gap: 18px; margin-top: 18px; }
-    .section { padding: 18px; border-radius: 26px; background: rgba(255,252,246,0.74); border: 1px solid var(--line); box-shadow: var(--shadow); scroll-margin-top: 110px; }
-    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .section { position: relative; padding: 18px; border-radius: 26px; background: rgba(255,252,246,0.74); border: 1px solid var(--line); box-shadow: var(--shadow); scroll-margin-top: 110px; }
+    .section::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 18px; width: 4px; border-radius: 999px; background: rgba(95,76,156,0.24); }
+    .section.is-active { border-color: rgba(95,76,156,0.24); box-shadow: 0 24px 60px rgba(95,76,156,0.12); transform: translateY(-1px); }
+    .section.is-active::before { background: linear-gradient(180deg, #5f4c9c, #24788f); }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; padding-left: 8px; }
     .section h2 { margin: 0; font-size: 1.32rem; letter-spacing: -0.02em; }
     .section p.sub { margin: 0; color: var(--muted); font-size: 0.93rem; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
@@ -113,6 +117,7 @@
     .note { font-size: 0.75rem; color: var(--muted); padding: 5px 8px; border-radius: 999px; background: rgba(255,255,255,0.8); border: 1px solid rgba(68,51,37,0.08); }
     .highlight { background: linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,249,240,0.94)); }
     .nextup { display: grid; gap: 10px; }
+    .focus-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; background: rgba(95,76,156,0.12); color: #382f65; border: 1px solid rgba(95,76,156,0.16); font-size: 0.8rem; font-weight: 700; }
     .nextup .big { font-family: Georgia, serif; font-size: 1.9rem; line-height: 1; margin: 0; }
     .callout { border-radius: 18px; padding: 14px; background: rgba(95,76,156,0.08); border: 1px solid rgba(95,76,156,0.12); color: #3f3571; }
     .callout strong { display: block; margin-bottom: 6px; font-size: 0.88rem; letter-spacing: 0.04em; text-transform: uppercase; }
@@ -219,7 +224,7 @@
   </div>
 
   <script>
-    const BUILD_VERSION = '2026-07-01-04-00';
+    const BUILD_VERSION = '2026-07-01-04-08';
     const agenda = [
   {
     "time": "09:15 - 09:30",
@@ -546,8 +551,8 @@
 
     function renderTimeNav() {
       timeNav.innerHTML = agenda.map((block) => {
-        const active = block.time === pinnedTime ? ' aria-current="true" style="border-color: rgba(95,76,156,0.42); background: rgba(95,76,156,0.12); color: #362d63;"' : '';
-        return `<a class="time-chip" href="#${slugify(block.time)}" data-time="${block.time}"${active}><span>${block.time}</span><span>${block.items.length}</span></a>`;
+        const active = block.time === pinnedTime ? ' is-active aria-current="true"' : '';
+        return `<a class="time-chip${active}" href="#${slugify(block.time)}" data-time="${block.time}"><span>${block.time}</span><span>${block.items.length}</span></a>`;
       }).join('');
     }
 
@@ -707,10 +712,11 @@
       agendaRoot.innerHTML = '';
       const visibleBlocks = getVisibleBlocks(query);
 
+      const activeSectionId = pinnedTime ? slugify(pinnedTime) : slugify(getFocusedPair(visibleBlocks).current?.time || visibleBlocks[0].time);
       for (const block of visibleBlocks) {
         const items = block.items;
         const section = document.createElement('section');
-        section.className = 'section';
+        section.className = `section${slugify(block.time) === activeSectionId ? ' is-active' : ''}`;
         section.id = slugify(block.time);
         const themeSummary = buildSummary(items).join(' · ');
         section.innerHTML = `
@@ -753,14 +759,14 @@
       const nextLabel = next && next.time === current?.time ? '下一場' : '下一場';
       nextUp.innerHTML = `
         <div class="callout">
-          <strong>${currentLabel}</strong>
+          <span class="focus-pill">${currentLabel}</span>
           <p class="big">${current ? current.time : spotlightSet[0].block.time}</p>
           <p style="margin:10px 0 6px;font-weight:700;">${currentItem.title}</p>
           <p style="margin:0;color:#4e426d;">${currentItem.room} · ${current ? current.level : visibleBlocks[0].level}</p>
           <p style="margin:10px 0 0;"><a href="#${slugify(current ? current.time : spotlightSet[0].block.time)}" data-target="${current ? current.time : spotlightSet[0].block.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">看這一段</a></p>
         </div>
         <div class="callout" style="background:rgba(36,120,143,0.08);border-color:rgba(36,120,143,0.14);color:#174e5e;">
-          <strong>${nextLabel}</strong>
+          <span class="focus-pill" style="background:rgba(36,120,143,0.12);color:#145061;border-color:rgba(36,120,143,0.16);">${nextLabel}</span>
           <p style="margin:10px 0 6px;font-weight:700;">${nextItem.title}</p>
           <p style="margin:0;opacity:.86;">${next ? next.time : current.time} · ${nextItem.room}</p>
           <p style="margin:10px 0 0;"><a href="#${slugify(next ? next.time : current.time)}" data-target="${next ? next.time : current.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">跳到下一場</a></p>
