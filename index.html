@@ -112,6 +112,31 @@
     .nextup .big { font-family: Georgia, serif; font-size: 1.9rem; line-height: 1; margin: 0; }
     .callout { border-radius: 18px; padding: 14px; background: rgba(95,76,156,0.08); border: 1px solid rgba(95,76,156,0.12); color: #3f3571; }
     .footer { margin: 20px 0 10px; color: var(--muted); font-size: 0.9rem; }
+    .backtop {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 30;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(68, 51, 37, 0.14);
+      background: rgba(36, 25, 16, 0.9);
+      color: #fff;
+      box-shadow: 0 16px 36px rgba(36, 25, 16, 0.22);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .backtop.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .backtop:hover { background: rgba(50, 35, 23, 0.96); }
     .hidden { display: none !important; }
     @media (max-width: 1200px) {
       .hero { grid-template-columns: 1fr; }
@@ -126,7 +151,7 @@
     }
   </style>
 </head>
-<body>
+<body id="top">
   <div class="wrap">
     <header class="topbar">
       <div class="brand">
@@ -184,6 +209,7 @@
     </main>
 
     <section class="content" id="timeline"></section>
+    <a class="backtop" id="backTop" href="#top" aria-label="回到上方">↑ 回到上方</a>
     <div class="footer">來源：Cloud Summit 2026 臺灣雲端大會議程頁（7/1）。</div>
   </div>
 
@@ -198,6 +224,7 @@
     const agendaRoot = document.getElementById('timeline');
     const nextUp = document.getElementById('nextUp');
     const search = document.getElementById('search');
+    const backTop = document.getElementById('backTop');
 
     const colorPalette = ['#24788f', '#c06b4f', '#5f4c9c', '#3b8f5d', '#b77d27', '#7b5a43'];
 
@@ -255,6 +282,14 @@
       if (!query) return true;
       const haystack = `${item.title} ${item.room} ${inferTags(item.title).join(' ')}`.toLowerCase();
       return haystack.includes(query);
+    }
+
+    function updateBackTop() {
+      if (window.scrollY > 420) {
+        backTop.classList.add('visible');
+      } else {
+        backTop.classList.remove('visible');
+      }
     }
 
     function renderAgenda() {
@@ -321,9 +356,12 @@
     }
 
     search.addEventListener('input', renderAgenda);
+    window.addEventListener('scroll', updateBackTop, { passive: true });
+    backTop.addEventListener('click', () => setTimeout(updateBackTop, 0));
     renderStats();
     renderTimeNav();
     renderAgenda();
+    updateBackTop();
   </script>
 </body>
 </html>
