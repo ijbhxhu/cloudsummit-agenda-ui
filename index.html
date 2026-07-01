@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cloud Summit 2026 議程表</title>
   <meta name="description" content="Cloud Summit 2026 7/1 議程整理，依時間、議題與會議室快速瀏覽。" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <style>
     :root {
       color-scheme: light;
@@ -290,6 +293,36 @@
       return hour * 60 + minute;
     }
 
+
+    async function ensureFreshBuild() {
+      try {
+        const response = await fetch(`version.json?ts=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) return true;
+        const latest = await response.json();
+        const latestVersion = String(latest.version || '').trim();
+        if (latestVersion && latestVersion !== BUILD_VERSION) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('v', latestVersion);
+          window.location.replace(url.toString());
+          return false;
+        }
+        const currentVersion = new URLSearchParams(window.location.search).get('v');
+        if (currentVersion !== BUILD_VERSION) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('v', BUILD_VERSION);
+          window.history.replaceState({}, '', url.toString());
+        }
+      } catch (error) {
+        const currentVersion = new URLSearchParams(window.location.search).get('v');
+        if (currentVersion !== BUILD_VERSION) {
+          const url = new URL(window.location.href);
+          url.searchParams.set('v', BUILD_VERSION);
+          window.history.replaceState({}, '', url.toString());
+        }
+      }
+      return true;
+    }
+
     function getTaipeiClock() {
       const parts = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'Asia/Taipei',
@@ -415,14 +448,20 @@
       `;
     }
 
-    search.addEventListener('input', renderAgenda);
-    window.addEventListener('scroll', updateBackTop, { passive: true });
-    backTop.addEventListener('click', () => setTimeout(updateBackTop, 0));
-    renderStats();
-    renderTimeNav();
-    renderAgenda();
-    updateBackTop();
-    setInterval(renderAgenda, 60 * 1000);
+    async function start() {
+      const isFresh = await ensureFreshBuild();
+      if (!isFresh) return;
+      search.addEventListener('input', renderAgenda);
+      window.addEventListener('scroll', updateBackTop, { passive: true });
+      backTop.addEventListener('click', () => setTimeout(updateBackTop, 0));
+      renderStats();
+      renderTimeNav();
+      renderAgenda();
+      updateBackTop();
+      setInterval(renderAgenda, 60 * 1000);
+    }
+
+    start();
   </script>
 </body>
 </html>
