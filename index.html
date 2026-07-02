@@ -74,6 +74,10 @@
     .stat { padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.66); border: 1px solid rgba(94,75,54,0.08); }
     .stat strong { display: block; font-family: Georgia, serif; font-size: 1.28rem; margin-bottom: 4px; }
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .day-switch { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 6px; }
+    .day-tab { appearance: none; border: 1px solid rgba(68,51,37,0.12); background: rgba(255,255,255,0.7); color: var(--muted); border-radius: 999px; padding: 8px 12px; font: inherit; font-size: 0.84rem; font-weight: 700; cursor: pointer; }
+    .day-tab.is-active { background: #2f2623; color: #fff; border-color: transparent; }
+    .day-tab:hover { border-color: rgba(95,76,156,0.28); }
     .chip, .time-chip {
       display: inline-flex; align-items: center; gap: 6px;
       border-radius: 999px; border: 1px solid rgba(93,75,56,0.14);
@@ -235,7 +239,7 @@
         <div class="brand-mark">CS</div>
         <div>
           <div>Cloud Summit 2026</div>
-          <div style="font-size:.82rem;color:var(--muted);font-weight:500;">7/1 議程整理</div>
+          <div style="font-size:.82rem;color:var(--muted);font-weight:500;">7/1 / 7/2 議程整理</div>
         </div>
       </div>
       <nav aria-label="主要導覽">
@@ -249,11 +253,12 @@
       <aside class="panel hero-copy">
         <div class="eyebrow">Cloud Summit 2026 / agenda</div>
         <h1>把今天的每一場課，整理成一眼就能讀完的時間軸。</h1>
-        <p class="lede">依時間、會議室、主題快速瀏覽 7 月 1 日的 Cloud Summit 議程。適合現場查課、找同軌、看下一場。</p>
+        <p class="lede">依時間、會議室、主題快速瀏覽 7/1 與 7/2 兩天的議程。適合現場查課、找同軌、看下一場。</p>
+        <div class="day-switch" id="daySwitch" role="tablist" aria-label="切換日期"></div>
         <div class="chips" id="themeChips"></div>
         <div class="actions">
           <a class="btn btn-primary" href="#timeline">看時間軸</a>
-          <a class="btn btn-secondary" href="https://cloudsummit.ithome.com.tw/2026/agenda" target="_blank" rel="noreferrer">回官方議程</a>
+          <a class="btn btn-secondary" id="officialAgendaLink" href="https://cloudsummit.ithome.com.tw/2026/agenda" target="_blank" rel="noreferrer">回官方議程</a>
         </div>
         <div class="hero-stats" id="stats"></div>
       </aside>
@@ -305,12 +310,13 @@
       </a>
     </div>
     <a class="backtop" id="backTop" href="#top" aria-label="回到上方">↑ 回到上方</a>
-    <div class="footer">來源：Cloud Summit 2026 臺灣雲端大會議程頁（7/1）。</div>
+    <div class="footer">來源：Cloud Summit 2026 與 AI Enterprise Summit 官方議程頁。</div>
   </div>
 
   <script>
-    const BUILD_VERSION = '2026-07-01-04-13';
-    const agenda = [
+    const BUILD_VERSION = '2026-07-02-02-28';
+    const agendaDay1 = [
+
   {
     "time": "09:15 - 09:30",
     "room": "701 ABC",
@@ -577,11 +583,383 @@
       }
     ]
   }
+    ];
+
+    const agendaDay2 = [
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "來賓報到 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "09:15 - 09:30",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "Welcome Remark",
+        "room": "701 ABC"
+      }
+    ]
+  },
+  {
+    "time": "09:30 - 10:00",
+    "room": "AI Enterprise",
+    "level": "KEYNOTE",
+    "items": [
+      {
+        "title": "AI 重塑金融：金融業AI落地的實踐與關鍵",
+        "room": "701 ABC"
+      }
+    ]
+  },
+  {
+    "time": "10:00 - 10:30",
+    "room": "AI Enterprise",
+    "level": "KEYNOTE",
+    "items": [
+      {
+        "title": "從導入 AI 到治理 Agent：企業負責任 AI 實務的新課題",
+        "room": "701 ABC"
+      }
+    ]
+  },
+  {
+    "time": "10:30 - 11:00",
+    "room": "AI Enterprise",
+    "level": "KEYNOTE",
+    "items": [
+      {
+        "title": "企業 AI 的 CoWoS 時刻：探討「多模型路由（Router）」的 Interposer 戰略",
+        "room": "701 ABC"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "換場時間",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "11:15 - 11:45",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "金融 AI 應用的深度整合與創新突破",
+        "room": "701 ABC"
+      },
+      {
+        "title": "從 ASK 到 Agent：企業 AI 落地新時代，IBM Bob 加速 AI Agent 普及與價值實現",
+        "room": "701D"
+      },
+      {
+        "title": "打造安全穩固及智慧高效的企業級 AI 數據中心 - 以 RAG AI 為例",
+        "room": "701E"
+      },
+      {
+        "title": "SMART on FHIR 遇上 LINE Bot：打造隱私優先的醫療 AI 架構",
+        "room": "701F"
+      },
+      {
+        "title": "企業級 AI Agent 落地應用：可治理、可規模化的智能代理平台",
+        "room": "701G"
+      },
+      {
+        "title": "Observability Architecture for Enterprise Agentic AI Agents",
+        "room": "701H"
+      },
+      {
+        "title": "數據感知與安全治理：打造企業級 AI 智能工作流",
+        "room": "702"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "換場時間 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "12:00 - 12:30",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "打造企業級 AI 基礎設施：從程式碼理解到 Agentic Workflow 的實戰藍圖與避坑指南",
+        "room": "701 ABC"
+      },
+      {
+        "title": "將算力化為行動力：企業級 AI 全棧整合與落地實踐",
+        "room": "701E"
+      },
+      {
+        "title": "讓 SLM 走進金融場景：國泰如何建構大規模資料、模型架構到評測的實戰經驗",
+        "room": "701F"
+      },
+      {
+        "title": "邊緣 AI 推論新時代：以全球最分散式網路驅動企業智慧應用",
+        "room": "701G"
+      },
+      {
+        "title": "噪音被聽成「好」怎麼辦？金融業智能外撥系統「雲地混合 ASR 仲裁架構」降低誤判率的上線實戰",
+        "room": "701H"
+      },
+      {
+        "title": "企業級代理式 AI (Agentic AI for The Enterprise)",
+        "room": "702"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "中午用餐 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "13:30 - 14:00",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "打造 Agentic AI 時代的企業基礎設施 Building Infrastructure for the Agentic AI Era",
+        "room": "701A"
+      },
+      {
+        "title": "規格驅動開發！軟體開發流程如何漸進式導入 AI",
+        "room": "701B"
+      },
+      {
+        "title": "金融機構的可程式化 AI 治理",
+        "room": "701C"
+      },
+      {
+        "title": "企業 AI Orchestration 低摩擦整合路線：以 MCP Server 工具化既有 API與 OAuth 授權治理",
+        "room": "701D"
+      },
+      {
+        "title": "Cloudflare AI 全戰略 從防禦爬蟲, Agent 實戰到 SASE 安全轉型",
+        "room": "701E"
+      },
+      {
+        "title": "Config-Driven Agentic AI：讓 AI Agent 用對話產出零售分析配置",
+        "room": "701F"
+      },
+      {
+        "title": "高科技製造業的 AI 轉型之路—從 IT 現代化、資訊可視化到全面 AI 賦能的實戰解析",
+        "room": "701G"
+      },
+      {
+        "title": "從 CIO 大調查看企業 AI 轉型新方向：AI 原生的崛起",
+        "room": "701H"
+      },
+      {
+        "title": "當 AI 成為你的第一個工程師：重新定義軟體交付的速度與規模",
+        "room": "702"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "換場時間 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "14:30 - 15:00",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "當 AI 成為企業工作日常：員工 AI 使用管理問題與實務情境解析",
+        "room": "701A"
+      },
+      {
+        "title": "Engineering Trust in AI-Generated Code",
+        "room": "701B"
+      },
+      {
+        "title": "Building a Production LLM Pipeline for Ad Content Review at Scale: Lessons from Argus",
+        "room": "701C"
+      },
+      {
+        "title": "企業級智能代理：自主協作與跨表整合分析實戰主動解題",
+        "room": "701D"
+      },
+      {
+        "title": "詩人騷客的 Vibe Coding 入門 (Vibe Coding for Poets)",
+        "room": "701E"
+      },
+      {
+        "title": "精準投資的基石：針對高複雜金融數據的 RAG 優化實踐",
+        "room": "701F"
+      },
+      {
+        "title": "自研 On-prem AI Agent 搭配企業知識庫與建築營造產業應用可能性",
+        "room": "701H"
+      },
+      {
+        "title": "從 Vertex AI 到 Agent Platform：企業 AI Agent 的雲端架構轉型",
+        "room": "702"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "換場時間 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "15:30 - 16:00",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "金融級 Enterprise Agentic AI 架構設計：從 PoC 到 Agentic Operating System",
+        "room": "701B"
+      },
+      {
+        "title": "從單點對話到多代理人協作：玉山銀行 GENIE 如何透過 Agentic AI 驅動企業級 AI 落地",
+        "room": "701C"
+      },
+      {
+        "title": "LLM O11y：從 Observability 到 Decision System",
+        "room": "701D"
+      },
+      {
+        "title": "銀行 AI 助手實戰：Multi-Agent AI 在金融場景的導入與應用經驗分享",
+        "room": "701E"
+      },
+      {
+        "title": "撕開轉型華麗的包裝：一場從「煉獄」爬回「現實」的中小型企業AI落地化的生存指南",
+        "room": "701F"
+      },
+      {
+        "title": "從應變到領先：如何因應AI Hype-大型製造業的 AI 轉型戰略與實踐經驗",
+        "room": "701G"
+      },
+      {
+        "title": "顧客理財的智能轉型：從最佳化演算法到商業價值的落地實踐",
+        "room": "701H"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "換場時間 暨 展⽰攤位參觀",
+        "room": "流程"
+      }
+    ]
+  },
+  {
+    "time": "16:30 - 17:00",
+    "room": "AI Enterprise",
+    "level": "AI Enterprise",
+    "items": [
+      {
+        "title": "AI 時代下的風險管理新思維：國際框架與在地實務的對接挑戰",
+        "room": "701A"
+      },
+      {
+        "title": "當 AI 成為開發夥伴：電商平台的 SDD 開發經驗",
+        "room": "701B"
+      },
+      {
+        "title": "從資料誠信到代理自動化：打造企業級可信AI治理架構與落地實踐",
+        "room": "701C"
+      },
+      {
+        "title": "當會議逐字稿變成能力數據：Hahow for Business 用 AI 重建培訓驗證的實戰紀錄",
+        "room": "701D"
+      },
+      {
+        "title": "Foundry Local 實戰：AI 驅動 Windows Server 2025 維運",
+        "room": "701E"
+      },
+      {
+        "title": "Agentic AI 導入關鍵：MCP Gateway 實踐",
+        "room": "701F"
+      },
+      {
+        "title": "零資料接觸架構：讓 LLM 讀懂企業資料但永遠摸不到它",
+        "room": "701G"
+      },
+      {
+        "title": "FDA 文件提取智能體：從正則到自癒 AI 的演進",
+        "room": "701H"
+      },
+      {
+        "title": "AI 驅動的工程師工作模式轉型：以 GitHub Copilot、M365 Copilot 等打造智慧化開發流程",
+        "room": "702"
+      }
+    ]
+  },
+  {
+    "time": null,
+    "room": "流程",
+    "level": "流程",
+    "items": [
+      {
+        "title": "贈品兌換 暨 撤場時間",
+        "room": "流程"
+      }
+    ]
+  }
 ];
+    const agendaByDay = {
+      '2026-07-01': agendaDay1,
+      '2026-07-02': agendaDay2,
+    };
+
+    const dayMeta = {
+      '2026-07-01': { label: '7/1 (三) Cloud Summit', sourceUrl: 'https://cloudsummit.ithome.com.tw/2026/agenda' },
+      '2026-07-02': { label: '7/2 (四) AI Enterprise Summit', sourceUrl: 'https://aienterprise.ithome.com.tw/2026/agendaTable' },
+    };
 
     const themeNames = ['AI Agent', 'Cloud Security', 'DevOps', 'FinOps', 'Data', 'Kubernetes', 'Governance', 'Multi-Agent'];
     const themeBox = document.getElementById('themes');
     const themeChips = document.getElementById('themeChips');
+    const daySwitch = document.getElementById('daySwitch');
+    const officialAgendaLink = document.getElementById('officialAgendaLink');
     const stats = document.getElementById('stats');
     const timeNav = document.getElementById('timeNav');
     const agendaRoot = document.getElementById('timeline');
@@ -591,7 +969,7 @@
     const mobileDock = document.querySelector('.mobile-dock');
 
     const colorPalette = ['#24788f', '#c06b4f', '#5f4c9c', '#3b8f5d', '#b77d27', '#7b5a43'];
-    const sessionLinks = {
+    const sessionLinksDay1 = {
       "Welcome Remark": "https://cloudsummit.ithome.com.tw/2026/session/4537",
       "馴服 Mythos 的烈馬，奔向 Cloud Fable：把 AI 攻擊力轉譯為雲端韌性與正向賦能": "https://cloudsummit.ithome.com.tw/2026/session/4538",
       "對抗 Agentic AI 浪潮：Fortinet 雲端安全新思維，重塑 AI 驅動的防禦韌性": "https://cloudsummit.ithome.com.tw/2026/session/4539",
@@ -641,6 +1019,64 @@
       "Microsoft Agent Framework + Orleans 打造雲地協同 AI 工作流": "https://cloudsummit.ithome.com.tw/2026/session/4598",
       "金融業生成式 AI 平台工程：以雲端原生架構打造可擴展的 Agentic AI 中樞": "https://cloudsummit.ithome.com.tw/2026/session/4597"
 };
+
+    const sessionLinksDay2 = {
+      "Welcome Remark": "https://aienterprise.ithome.com.tw/2026/session/4601",
+      "AI 重塑金融：金融業AI落地的實踐與關鍵": "https://aienterprise.ithome.com.tw/2026/session/4602",
+      "從導入 AI 到治理 Agent：企業負責任 AI 實務的新課題": "https://aienterprise.ithome.com.tw/2026/session/4603",
+      "企業 AI 的 CoWoS 時刻：探討「多模型路由（Router）」的 Interposer 戰略": "https://aienterprise.ithome.com.tw/2026/session/4604",
+      "金融 AI 應用的深度整合與創新突破": "https://aienterprise.ithome.com.tw/2026/session/4606",
+      "從 ASK 到 Agent：企業 AI 落地新時代，IBM Bob 加速 AI Agent 普及與價值實現": "https://aienterprise.ithome.com.tw/2026/session/4610",
+      "打造安全穩固及智慧高效的企業級 AI 數據中心 - 以 RAG AI 為例": "https://aienterprise.ithome.com.tw/2026/session/4607",
+      "SMART on FHIR 遇上 LINE Bot：打造隱私優先的醫療 AI 架構": "https://aienterprise.ithome.com.tw/2026/session/4609",
+      "企業級 AI Agent 落地應用：可治理、可規模化的智能代理平台": "https://aienterprise.ithome.com.tw/2026/session/4608",
+      "Observability Architecture for Enterprise Agentic AI Agents": "https://aienterprise.ithome.com.tw/2026/session/4612",
+      "數據感知與安全治理：打造企業級 AI 智能工作流": "https://aienterprise.ithome.com.tw/2026/session/4611",
+      "打造企業級 AI 基礎設施：從程式碼理解到 Agentic Workflow 的實戰藍圖與避坑指南": "https://aienterprise.ithome.com.tw/2026/session/4614",
+      "將算力化為行動力：企業級 AI 全棧整合與落地實踐": "https://aienterprise.ithome.com.tw/2026/session/4615",
+      "讓 SLM 走進金融場景：國泰如何建構大規模資料、模型架構到評測的實戰經驗": "https://aienterprise.ithome.com.tw/2026/session/4617",
+      "邊緣 AI 推論新時代：以全球最分散式網路驅動企業智慧應用": "https://aienterprise.ithome.com.tw/2026/session/4616",
+      "噪音被聽成「好」怎麼辦？金融業智能外撥系統「雲地混合 ASR 仲裁架構」降低誤判率的上線實戰": "https://aienterprise.ithome.com.tw/2026/session/4620",
+      "企業級代理式 AI (Agentic AI for The Enterprise)": "https://aienterprise.ithome.com.tw/2026/session/4619",
+      "打造 Agentic AI 時代的企業基礎設施 Building Infrastructure for the Agentic AI Era": "https://aienterprise.ithome.com.tw/2026/session/4622",
+      "規格驅動開發！軟體開發流程如何漸進式導入 AI": "https://aienterprise.ithome.com.tw/2026/session/4626",
+      "金融機構的可程式化 AI 治理": "https://aienterprise.ithome.com.tw/2026/session/4624",
+      "企業 AI Orchestration 低摩擦整合路線：以 MCP Server 工具化既有 API與 OAuth 授權治理": "https://aienterprise.ithome.com.tw/2026/session/4625",
+      "Cloudflare AI 全戰略 從防禦爬蟲, Agent 實戰到 SASE 安全轉型": "https://aienterprise.ithome.com.tw/2026/session/4623",
+      "Config-Driven Agentic AI：讓 AI Agent 用對話產出零售分析配置": "https://aienterprise.ithome.com.tw/2026/session/4627",
+      "高科技製造業的 AI 轉型之路—從 IT 現代化、資訊可視化到全面 AI 賦能的實戰解析": "https://aienterprise.ithome.com.tw/2026/session/4628",
+      "從 CIO 大調查看企業 AI 轉型新方向：AI 原生的崛起": "https://aienterprise.ithome.com.tw/2026/session/4630",
+      "當 AI 成為你的第一個工程師：重新定義軟體交付的速度與規模": "https://aienterprise.ithome.com.tw/2026/session/4629",
+      "當 AI 成為企業工作日常：員工 AI 使用管理問題與實務情境解析": "https://aienterprise.ithome.com.tw/2026/session/4632",
+      "Engineering Trust in AI-Generated Code": "https://aienterprise.ithome.com.tw/2026/session/4633",
+      "Building a Production LLM Pipeline for Ad Content Review at Scale: Lessons from Argus": "https://aienterprise.ithome.com.tw/2026/session/4634",
+      "企業級智能代理：自主協作與跨表整合分析實戰主動解題": "https://aienterprise.ithome.com.tw/2026/session/4635",
+      "詩人騷客的 Vibe Coding 入門 (Vibe Coding for Poets)": "https://aienterprise.ithome.com.tw/2026/session/4636",
+      "精準投資的基石：針對高複雜金融數據的 RAG 優化實踐": "https://aienterprise.ithome.com.tw/2026/session/4637",
+      "自研 On-prem AI Agent 搭配企業知識庫與建築營造產業應用可能性": "https://aienterprise.ithome.com.tw/2026/session/4640",
+      "從 Vertex AI 到 Agent Platform：企業 AI Agent 的雲端架構轉型": "https://aienterprise.ithome.com.tw/2026/session/4639",
+      "金融級 Enterprise Agentic AI 架構設計：從 PoC 到 Agentic Operating System": "https://aienterprise.ithome.com.tw/2026/session/4643",
+      "從單點對話到多代理人協作：玉山銀行 GENIE 如何透過 Agentic AI 驅動企業級 AI 落地": "https://aienterprise.ithome.com.tw/2026/session/4644",
+      "LLM O11y：從 Observability 到 Decision System": "https://aienterprise.ithome.com.tw/2026/session/4645",
+      "銀行 AI 助手實戰：Multi-Agent AI 在金融場景的導入與應用經驗分享": "https://aienterprise.ithome.com.tw/2026/session/4646",
+      "撕開轉型華麗的包裝：一場從「煉獄」爬回「現實」的中小型企業AI落地化的生存指南": "https://aienterprise.ithome.com.tw/2026/session/4647",
+      "從應變到領先：如何因應AI Hype-大型製造業的 AI 轉型戰略與實踐經驗": "https://aienterprise.ithome.com.tw/2026/session/4648",
+      "顧客理財的智能轉型：從最佳化演算法到商業價值的落地實踐": "https://aienterprise.ithome.com.tw/2026/session/4650",
+      "AI 時代下的風險管理新思維：國際框架與在地實務的對接挑戰": "https://aienterprise.ithome.com.tw/2026/session/4652",
+      "當 AI 成為開發夥伴：電商平台的 SDD 開發經驗": "https://aienterprise.ithome.com.tw/2026/session/4653",
+      "從資料誠信到代理自動化：打造企業級可信AI治理架構與落地實踐": "https://aienterprise.ithome.com.tw/2026/session/4654",
+      "當會議逐字稿變成能力數據：Hahow for Business 用 AI 重建培訓驗證的實戰紀錄": "https://aienterprise.ithome.com.tw/2026/session/4655",
+      "Foundry Local 實戰：AI 驅動 Windows Server 2025 維運": "https://aienterprise.ithome.com.tw/2026/session/4656",
+      "Agentic AI 導入關鍵：MCP Gateway 實踐": "https://aienterprise.ithome.com.tw/2026/session/4657",
+      "零資料接觸架構：讓 LLM 讀懂企業資料但永遠摸不到它": "https://aienterprise.ithome.com.tw/2026/session/4658",
+      "FDA 文件提取智能體：從正則到自癒 AI 的演進": "https://aienterprise.ithome.com.tw/2026/session/4660",
+      "AI 驅動的工程師工作模式轉型：以 GitHub Copilot、M365 Copilot 等打造智慧化開發流程": "https://aienterprise.ithome.com.tw/2026/session/4659"
+};
+    const sessionLinksByDay = {
+      '2026-07-01': sessionLinksDay1,
+      '2026-07-02': sessionLinksDay2,
+    };
+    let selectedDay = '2026-07-01';
     let pinnedTime = null;
 
     function inferTags(title) {
@@ -665,8 +1101,17 @@
       return colorPalette[hash % colorPalette.length];
     }
 
+    function getActiveAgenda() {
+      return agendaByDay[selectedDay] || agendaDay1;
+    }
+
+    function activeDayMeta() {
+      return dayMeta[selectedDay] || dayMeta['2026-07-01'];
+    }
+
     function officialUrlFor(title) {
-      return sessionLinks[title] || '';
+      const dayLinks = sessionLinksByDay[selectedDay] || {};
+      return dayLinks[title] || '';
     }
 
     function openOfficialSession(url) {
@@ -680,14 +1125,27 @@
       return [...tagCount.entries()].sort((a,b) => b[1] - a[1]).slice(0, 4).map(([tag, count]) => `${tag} · ${count}`);
     }
 
+    function renderDaySwitch() {
+      const activeMeta = activeDayMeta();
+      daySwitch.innerHTML = Object.entries(dayMeta).map(([day, meta]) => {
+        const active = day === selectedDay ? ' is-active' : '';
+        return `<button class="day-tab${active}" type="button" data-day="${day}" role="tab" aria-pressed="${day === selectedDay ? 'true' : 'false'}">${meta.label}</button>`;
+      }).join('');
+      officialAgendaLink.href = activeMeta.sourceUrl;
+      officialAgendaLink.textContent = `回 ${activeMeta.label} 官方頁`;
+      document.title = `Cloud Summit 2026 議程表｜${activeMeta.label}`;
+    }
+
     function renderStats() {
+      const agenda = getActiveAgenda();
       const sessionCount = agenda.reduce((sum, block) => sum + block.items.length, 0);
       const roomCount = new Set(agenda.flatMap((block) => block.items.map((item) => item.room))).size;
       const themes = buildSummary(agenda.flatMap((block) => block.items));
+      const activeMeta = activeDayMeta();
       const statsData = [
-        ['時段', `${agenda.length} 個`],
-        ['議程', `${sessionCount} 場`],
-        ['會議室', `${roomCount} 個`],
+        ['日期', activeMeta.label],
+        ['時段', `${agenda.filter((block) => block.time).length} 個`],
+        ['項目', `${sessionCount} 項`],
       ];
       stats.innerHTML = statsData.map(([label, value]) => `<div class="stat"><strong>${value}</strong><span>${label}</span></div>`).join('');
       themeChips.innerHTML = themes.map((t) => `<span class="chip">${t}</span>`).join('');
@@ -695,7 +1153,8 @@
     }
 
     function renderTimeNav() {
-      timeNav.innerHTML = agenda.map((block) => {
+      const agenda = getActiveAgenda();
+      timeNav.innerHTML = agenda.filter((block) => block.time).map((block) => {
         const active = block.time === pinnedTime ? ' is-active aria-current="true"' : '';
         return `<a class="time-chip${active}" href="#${slugify(block.time)}" data-time="${block.time}"><span>${block.time}</span><span>${block.items.length}</span></a>`;
       }).join('');
@@ -765,6 +1224,7 @@
     }
 
     function getVisibleBlocks(query) {
+      const agenda = getActiveAgenda();
       return agenda
         .map((block) => ({
           ...block,
@@ -774,10 +1234,11 @@
     }
 
     function pickNowAndNext(blocks) {
-      if (!blocks.length) return { current: null, next: null };
+      const timeBlocks = blocks.filter((block) => block.time);
+      if (!timeBlocks.length) return { current: null, next: null };
       const clock = getTaipeiClock();
-      const eventDate = '2026-07-01';
-      const blocksWithMinutes = blocks.map((block) => ({ ...block, startMinutes: parseTimeToMinutes(block.time) }));
+      const eventDate = selectedDay;
+      const blocksWithMinutes = timeBlocks.map((block) => ({ ...block, startMinutes: parseTimeToMinutes(block.time) }));
       if (clock.date < eventDate) {
         return { current: blocksWithMinutes[0], next: blocksWithMinutes[1] || blocksWithMinutes[0] };
       }
@@ -829,7 +1290,8 @@
 
     function syncFromHash() {
       const hash = window.location.hash.replace(/^#/, '');
-      const block = agenda.find((entry) => slugify(entry.time) === hash);
+      const agenda = getActiveAgenda();
+      const block = agenda.filter((entry) => entry.time).find((entry) => slugify(entry.time) === hash);
       if (!block) {
         if (!hash) {
           pinnedTime = null;
@@ -847,7 +1309,11 @@
 
     function getFocusedPair(visibleBlocks) {
       if (!visibleBlocks.length) return { current: null, next: null };
-      const blocksWithMinutes = visibleBlocks.map((block) => ({ ...block, startMinutes: parseTimeToMinutes(block.time) }));
+      const timeBlocks = visibleBlocks.filter((block) => block.time);
+      if (!timeBlocks.length) {
+        return { current: visibleBlocks[0], next: visibleBlocks[1] || visibleBlocks[0] };
+      }
+      const blocksWithMinutes = timeBlocks.map((block) => ({ ...block, startMinutes: parseTimeToMinutes(block.time) }));
       const selectedIndex = pinnedTime ? blocksWithMinutes.findIndex((block) => block.time === pinnedTime) : -1;
       if (selectedIndex >= 0) {
         return {
@@ -855,26 +1321,35 @@
           next: blocksWithMinutes[selectedIndex + 1] || blocksWithMinutes[selectedIndex],
         };
       }
-      return pickNowAndNext(visibleBlocks);
+      return pickNowAndNext(timeBlocks);
     }
 
     function renderAgenda() {
       const query = search.value.trim().toLowerCase();
       agendaRoot.innerHTML = '';
       const visibleBlocks = getVisibleBlocks(query);
+      const timeBlocks = visibleBlocks.filter((block) => block.time);
+      const focusBlocks = timeBlocks.length ? timeBlocks : visibleBlocks;
+      const { current, next } = getFocusedPair(focusBlocks);
+      const currentBlock = current || visibleBlocks[0] || null;
+      const currentItem = currentBlock?.items?.[0] || null;
+      const nextBlock = next || currentBlock || null;
+      const nextItem = nextBlock?.items?.[0] || currentItem || null;
+      const activeSectionId = pinnedTime
+        ? slugify(pinnedTime)
+        : (currentBlock?.time ? slugify(currentBlock.time) : `flow-${selectedDay}`);
 
-      const activeSectionId = pinnedTime ? slugify(pinnedTime) : slugify(getFocusedPair(visibleBlocks).current?.time || visibleBlocks[0].time);
-      for (const block of visibleBlocks) {
+      for (const [index, block] of visibleBlocks.entries()) {
         const items = block.items;
         const section = document.createElement('section');
-        section.className = `section${slugify(block.time) === activeSectionId ? ' is-active' : ''}`;
-        section.id = slugify(block.time);
+        section.className = `section${block.time && slugify(block.time) === activeSectionId ? ' is-active' : ''}`;
+        section.id = block.time ? slugify(block.time) : `flow-${selectedDay}-${index}`;
         const themeSummary = buildSummary(items).join(' · ');
         section.innerHTML = `
           <div class="section-head">
             <div>
-              <h2>${block.time}</h2>
-              <p class="sub">${block.room} / ${block.level} / ${items.length} 場</p>
+              <h2>${block.time || '流程項目'}</h2>
+              <p class="sub">${block.room} / ${block.level} / ${items.length} 項</p>
             </div>
             <p class="sub">${themeSummary}</p>
           </div>
@@ -883,7 +1358,7 @@
               const tags = inferTags(item.title);
               const accent = colorFor(item.title);
               const officialUrl = officialUrlFor(item.title);
-            return `<article class="session session-clickable" style="--bar:${accent}" data-session-url="${officialUrl || ''}" tabindex="0" role="link" aria-label="${item.title}${officialUrl ? '，開啟官方議程頁' : ''}">
+              return `<article class="session session-clickable" style="--bar:${accent}" data-session-url="${officialUrl || ''}" tabindex="0" role="link" aria-label="${item.title}${officialUrl ? '，開啟官方議程頁' : ''}">
                 <div class="meta">
                   <span class="room">${item.room}</span>
                   <span class="level">${block.level}</span>
@@ -904,32 +1379,44 @@
         return;
       }
 
-      const spotlightSet = visibleBlocks.flatMap((block) => block.items.map((item) => ({ block, item })));
-      const { current, next } = getFocusedPair(visibleBlocks);
-      const currentItem = current?.items[0] || spotlightSet[0]?.item;
-      const nextItem = next?.items[0] || spotlightSet[1]?.item || spotlightSet[0]?.item;
-      const currentLabel = current && current.time === next?.time ? '目前這場' : '目前這段';
-      const nextLabel = next && next.time === current?.time ? '下一場' : '下一場';
+      if (!currentBlock || !currentItem || !nextItem) {
+        const fallbackBlock = visibleBlocks[0];
+        const fallbackItem = fallbackBlock?.items?.[0];
+        nextUp.innerHTML = `
+          <div class="callout">
+            <span class="focus-pill">目前項目</span>
+            <p class="big">${fallbackBlock?.time || '流程'}</p>
+            <p style="margin:10px 0 6px;font-weight:700;">${fallbackItem?.title || '沒有可顯示的項目'}</p>
+            <p style="margin:0;color:#4e426d;">${fallbackItem?.room || '—'} · ${fallbackBlock?.level || '—'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const currentLabel = currentBlock.time && currentBlock.time === nextBlock?.time ? '目前這場' : '目前這段';
+      const nextLabel = nextBlock?.time && nextBlock.time === currentBlock?.time ? '下一場' : '下一場';
       nextUp.innerHTML = `
         <div class="callout">
           <span class="focus-pill">${currentLabel}</span>
-          <p class="big">${current ? current.time : spotlightSet[0].block.time}</p>
+          <p class="big">${currentBlock.time || '流程'}</p>
           <p style="margin:10px 0 6px;font-weight:700;">${currentItem.title}</p>
-          <p style="margin:0;color:#4e426d;">${currentItem.room} · ${current ? current.level : visibleBlocks[0].level}</p>
-          <p style="margin:10px 0 0;"><a href="#${slugify(current ? current.time : spotlightSet[0].block.time)}" data-target="${current ? current.time : spotlightSet[0].block.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">看這一段</a></p>
+          <p style="margin:0;color:#4e426d;">${currentItem.room} · ${currentBlock.level}</p>
+          ${currentBlock.time ? `<p style="margin:10px 0 0;"><a href="#${slugify(currentBlock.time)}" data-target="${currentBlock.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">看這一段</a></p>` : ''}
         </div>
         <div class="callout" style="background:rgba(36,120,143,0.08);border-color:rgba(36,120,143,0.14);color:#174e5e;">
           <span class="focus-pill" style="background:rgba(36,120,143,0.12);color:#145061;border-color:rgba(36,120,143,0.16);">${nextLabel}</span>
           <p style="margin:10px 0 6px;font-weight:700;">${nextItem.title}</p>
-          <p style="margin:0;opacity:.86;">${next ? next.time : current.time} · ${nextItem.room}</p>
-          <p style="margin:10px 0 0;"><a href="#${slugify(next ? next.time : current.time)}" data-target="${next ? next.time : current.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">跳到下一場</a></p>
+          <p style="margin:0;opacity:.86;">${nextBlock.time || '流程'} · ${nextItem.room}</p>
+          ${nextBlock.time ? `<p style="margin:10px 0 0;"><a href="#${slugify(nextBlock.time)}" data-target="${nextBlock.time}" class="time-chip" style="display:inline-flex;width:auto;padding:8px 10px;">跳到下一場</a></p>` : ''}
         </div>
       `;
     }
 
     async function start() {
+
       const isFresh = await ensureFreshBuild();
       if (!isFresh) return;
+      renderDaySwitch();
       timeNav.addEventListener('click', (event) => {
         const link = event.target.closest('a[data-time]');
         if (!link) return;
