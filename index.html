@@ -314,7 +314,7 @@
   </div>
 
   <script>
-    const BUILD_VERSION = '2026-07-02-02-30';
+    const BUILD_VERSION = '2026-07-02-02-49';
     const agendaDay1 = [
 
   {
@@ -1093,7 +1093,7 @@
       window.history.replaceState({}, '', url.toString());
     }
 
-    let selectedDay = normalizeDay(new URLSearchParams(window.location.search).get('day')) || (dayMeta[getTaipeiClock().date] ? getTaipeiClock().date : '2026-07-01');
+    let selectedDay = normalizeDay(new URLSearchParams(window.location.search).get('day')) || '2026-07-01';
     let pinnedTime = null;
 
     function inferTags(title) {
@@ -1146,7 +1146,11 @@
       const activeMeta = activeDayMeta();
       daySwitch.innerHTML = Object.entries(dayMeta).map(([day, meta]) => {
         const active = day === selectedDay ? ' is-active' : '';
-        return `<button class="day-tab${active}" type="button" data-day="${day}" role="tab" aria-pressed="${day === selectedDay ? 'true' : 'false'}">${meta.label}</button>`;
+        const url = new URL(window.location.href);
+        url.searchParams.set('day', day);
+        url.searchParams.set('v', BUILD_VERSION);
+        url.hash = '#highlight';
+        return `<a class="day-tab${active}" href="${url.toString()}" data-day="${day}" role="tab" aria-pressed="${day === selectedDay ? 'true' : 'false'}">${meta.label}</a>`;
       }).join('');
       officialAgendaLink.href = activeMeta.sourceUrl;
       officialAgendaLink.textContent = `回 ${activeMeta.label} 官方頁`;
@@ -1334,7 +1338,8 @@
       renderStats();
       renderTimeNav();
       renderAgenda();
-      setUrlState(selectedDay, window.location.hash.replace(/^#/, '') || null);
+      setUrlState(selectedDay, null);
+      scrollToSection('highlight');
       syncFromHash();
     }
 
@@ -1450,9 +1455,10 @@
       renderDaySwitch();
       setUrlState(selectedDay, window.location.hash.replace(/^#/, '') || null);
       daySwitch.addEventListener('click', (event) => {
-        const button = event.target.closest('button[data-day]');
-        if (!button) return;
-        switchDay(button.dataset.day);
+        const link = event.target.closest('a[data-day]');
+        if (!link) return;
+        event.preventDefault();
+        switchDay(link.dataset.day);
       });
       timeNav.addEventListener('click', (event) => {
         const link = event.target.closest('a[data-time]');
