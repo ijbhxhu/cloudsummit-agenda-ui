@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cloud Summit 2026 議程表</title>
-  <meta name="description" content="Cloud Summit 2026 7/1 議程整理，依時間、議題與會議室快速瀏覽。" />
+  <title>Cloud + AI Enterprise Summit 2026 議程表</title>
+  <meta name="description" content="Cloud + AI Enterprise Summit 2026 7/1~7/2 雙日議程整理，依時間、議題與會議室快速瀏覽。" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -251,8 +251,8 @@
 
     <main class="hero">
       <aside class="panel hero-copy">
-        <div class="eyebrow">Cloud Summit 2026 / agenda</div>
-        <h1>把今天的每一場課，整理成一眼就能讀完的時間軸。</h1>
+        <div class="eyebrow">Cloud + AI Enterprise Summit 2026 / agenda</div>
+        <h1>把 7/1 與 7/2 的每一場課，整理成一眼就能讀完的時間軸。</h1>
         <p class="lede">依時間、會議室、主題快速瀏覽 7/1 與 7/2 兩天的議程。適合現場查課、找同軌、看下一場。</p>
         <div class="day-switch" id="daySwitch" role="tablist" aria-label="切換日期"></div>
         <div class="chips" id="themeChips"></div>
@@ -314,7 +314,7 @@
   </div>
 
   <script>
-    const BUILD_VERSION = '2026-07-02-02-28';
+    const BUILD_VERSION = '2026-07-02-02-30';
     const agendaDay1 = [
 
   {
@@ -1076,7 +1076,24 @@
       '2026-07-01': sessionLinksDay1,
       '2026-07-02': sessionLinksDay2,
     };
-    let selectedDay = '2026-07-01';
+
+    function normalizeDay(day) {
+      return dayMeta[day] ? day : '';
+    }
+
+    function setUrlState(day = selectedDay, time = null) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('day', day);
+      url.searchParams.set('v', BUILD_VERSION);
+      if (time) {
+        url.hash = `#${slugify(time)}`;
+      } else {
+        url.hash = '';
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+
+    let selectedDay = normalizeDay(new URLSearchParams(window.location.search).get('day')) || (dayMeta[getTaipeiClock().date] ? getTaipeiClock().date : '2026-07-01');
     let pinnedTime = null;
 
     function inferTags(title) {
@@ -1133,7 +1150,7 @@
       }).join('');
       officialAgendaLink.href = activeMeta.sourceUrl;
       officialAgendaLink.textContent = `回 ${activeMeta.label} 官方頁`;
-      document.title = `Cloud Summit 2026 議程表｜${activeMeta.label}`;
+      document.title = `Cloud + AI Enterprise Summit 2026 議程表｜${activeMeta.label}`;
     }
 
     function renderStats() {
@@ -1285,6 +1302,7 @@
       pinnedTime = time;
       renderTimeNav();
       renderAgenda();
+      setUrlState(selectedDay, time);
       scrollToSection(slugify(time));
     }
 
@@ -1305,6 +1323,19 @@
         renderTimeNav();
         renderAgenda();
       }
+    }
+
+    function switchDay(day) {
+      const nextDay = normalizeDay(day);
+      if (!nextDay || nextDay === selectedDay) return;
+      selectedDay = nextDay;
+      pinnedTime = null;
+      renderDaySwitch();
+      renderStats();
+      renderTimeNav();
+      renderAgenda();
+      setUrlState(selectedDay, window.location.hash.replace(/^#/, '') || null);
+      syncFromHash();
     }
 
     function getFocusedPair(visibleBlocks) {
@@ -1417,6 +1448,12 @@
       const isFresh = await ensureFreshBuild();
       if (!isFresh) return;
       renderDaySwitch();
+      setUrlState(selectedDay, window.location.hash.replace(/^#/, '') || null);
+      daySwitch.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-day]');
+        if (!button) return;
+        switchDay(button.dataset.day);
+      });
       timeNav.addEventListener('click', (event) => {
         const link = event.target.closest('a[data-time]');
         if (!link) return;
